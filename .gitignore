@@ -28,6 +28,7 @@ yarn-error.log*
 # Local env files
 .env
 .env*.local
+.env.local.example
 
 # Vercel
 .vercel
@@ -40,7 +41,14 @@ next-env.d.ts
 prisma/*.db
 prisma/*.db-journal
 
+# Ignore entire Prisma folder (schema may contain secrets)
+prisma/
+
 # Sensitive local admin scripts
 create-admin.js
 check-admin.js
 scripts/
+
+# Editor settings
+.vscode
+
