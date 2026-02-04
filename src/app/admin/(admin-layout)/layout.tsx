@@ -31,50 +31,67 @@ export default async function AdminLayout({
 
             {/* Content area with left sidebar */}
             <div className="flex">
-                <aside className="w-64 bg-gray-800 text-white min-h-screen sticky top-0">
-                    <div className="p-6 border-b border-gray-700">
-                        <h2 className="text-lg font-bold">Admin</h2>
+                <aside className="w-72 bg-purple-700 text-white min-h-screen sticky top-0 shadow-md">
+                    <div className="p-6 border-b border-purple-600 flex items-center">
+                        <div className="w-14 h-14 rounded-full bg-purple-900 flex items-center justify-center mr-4">
+                            <span className="uppercase font-bold text-lg">A</span>
+                        </div>
+                        <div>
+                            <div className="text-sm text-purple-200">Welcome</div>
+                            <div className="font-semibold">Administrator</div>
+                        </div>
                     </div>
+
                     <nav className="p-4">
-                        <ul className="space-y-2">
+                        <ul className="space-y-3">
                             <li>
-                                <Link href="/admin/dashboard" className="block px-3 py-2 rounded hover:bg-gray-700">
-                                    Dashboard
+                                <Link href="/admin/dashboard" className="flex items-center px-4 py-3 rounded-lg hover:bg-purple-600 transition">
+                                    <svg className="w-5 h-5 mr-3 text-orange-300" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 3h18v18H3V3z"></path></svg>
+                                    <span>Dashboard</span>
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/admin/packages" className="block px-3 py-2 rounded hover:bg-gray-700">
-                                    Tour Packages
+                                <Link href="/admin/packages" className="flex items-center px-4 py-3 rounded-lg hover:bg-purple-600 transition">
+                                    <svg className="w-5 h-5 mr-3 text-orange-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20 13V7a2 2 0 00-2-2h-6"></path></svg>
+                                    <span>Tour Packages</span>
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/admin/users" className="block px-3 py-2 rounded hover:bg-gray-700">
-                                    Manage Users
+                                <Link href="/admin/users" className="flex items-center px-4 py-3 rounded-lg hover:bg-purple-600 transition">
+                                    <svg className="w-5 h-5 mr-3 text-orange-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5.121 17.804A13.937 13.937 0 0112 15c2.21 0 4.31.454 6.187 1.255M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+                                    <span>Manage Users</span>
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/admin/bookings" className="block px-3 py-2 rounded hover:bg-gray-700">
-                                    Manage Booking
+                                <Link href="/admin/bookings" className="flex items-center px-4 py-3 rounded-lg hover:bg-purple-600 transition">
+                                    <svg className="w-5 h-5 mr-3 text-orange-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7h18M3 12h18M3 17h18"/></svg>
+                                    <span>Manage Booking</span>
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/admin/issues" className="block px-3 py-2 rounded hover:bg-gray-700">
-                                    Manage Issues
+                                <Link href="/admin/issues" className="flex items-center px-4 py-3 rounded-lg hover:bg-purple-600 transition">
+                                    <svg className="w-5 h-5 mr-3 text-orange-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6M9 16h6M9 8h6"/></svg>
+                                    <span>Manage Issues</span>
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/admin/enquiries" className="block px-3 py-2 rounded hover:bg-gray-700">
-                                    Manage Enquiries
+                                <Link href="/admin/enquiries" className="flex items-center px-4 py-3 rounded-lg hover:bg-purple-600 transition">
+                                    <svg className="w-5 h-5 mr-3 text-orange-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M7 8h10M7 12h6"/></svg>
+                                    <span>Manage Enquiries</span>
                                 </Link>
                             </li>
                             <li>
-                                <Link href="/admin/pages" className="block px-3 py-2 rounded hover:bg-gray-700">
-                                    Manage Pages
+                                <Link href="/admin/pages" className="flex items-center px-4 py-3 rounded-lg hover:bg-purple-600 transition">
+                                    <svg className="w-5 h-5 mr-3 text-orange-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 7h18M3 17h18"/></svg>
+                                    <span>Manage Pages</span>
                                 </Link>
                             </li>
-                            
                         </ul>
                     </nav>
+
+                    <div className="mt-auto p-4 border-t border-purple-600">
+                        <AdminLogout />
+                    </div>
                 </aside>
 
                 <main className="flex-1 p-6">{children}</main>
