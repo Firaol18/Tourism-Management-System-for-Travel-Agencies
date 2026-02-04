@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Admin {
+  id           Int      @id @default(autoincrement())
+  username     String   @unique @map("UserName") @db.VarChar(100)
+  password     String   @map("Password") @db.VarChar(100)
+  updationDate DateTime @default(now()) @updatedAt @map("updationDate")
+
+  @@map("admin")
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  fullName     String    @map("FullName") @db.VarChar(100)
+  mobileNumber String    @map("MobileNumber") @db.Char(10)
+  emailId      String    @unique @map("EmailId") @db.VarChar(70)
+  password     String    @map("Password") @db.VarChar(100)
+  regDate      DateTime  @default(now()) @map("RegDate")
+  updationDate DateTime  @default(now()) @updatedAt @map("UpdationDate")
+  bookings     Booking[]
+  issues       Issue[]
+
+  @@index([emailId])
+  @@map("tblusers")
+}
+
+model TourPackage {
+  id              Int       @id @default(autoincrement()) @map("PackageId")
+  packageName     String    @map("PackageName") @db.VarChar(200)
+  packageType     String    @map("PackageType") @db.VarChar(150)
+  packageLocation String    @map("PackageLocation") @db.VarChar(100)
+  packagePrice    Int       @map("PackagePrice")
+  packageFeatures String    @map("PackageFetures") @db.VarChar(255)
+  packageDetails  String    @map("PackageDetails")
+  packageImage    String    @map("PackageImage") @db.VarChar(100)
+  creationDate    DateTime  @default(now()) @map("Creationdate")
+  updationDate    DateTime? @updatedAt @map("UpdationDate")
+  bookings        Booking[]
+
+  @@map("tbltourpackages")
+}
+
+model Booking {
+  id           Int         @id @default(autoincrement()) @map("BookingId")
+  packageId    Int         @map("PackageId")
+  userEmail    String      @map("UserEmail") @db.VarChar(100)
+  fromDate     String      @map("FromDate") @db.VarChar(100)
+  toDate       String      @map("ToDate") @db.VarChar(100)
+  comment      String      @map("Comment")
+  regDate      DateTime    @default(now()) @map("RegDate")
+  status       Int         @default(0)
+  cancelledBy  String?     @map("CancelledBy") @db.VarChar(5)
+  updationDate DateTime?   @updatedAt @map("UpdationDate")
+  package      TourPackage @relation(fields: [packageId], references: [id])
+  user         User        @relation(fields: [userEmail], references: [emailId])
+
+  @@map("tblbooking")
+}
+
+model Enquiry {
+  id           Int      @id @default(autoincrement())
+  fullName     String   @map("FullName") @db.VarChar(100)
+  emailId      String   @map("EmailId") @db.VarChar(100)
+  mobileNumber String   @map("MobileNumber") @db.Char(10)
+  subject      String   @map("Subject") @db.VarChar(100)
+  description  String   @map("Description")
+  postingDate  DateTime @default(now()) @map("PostingDate")
+  status       Int?     @map("Status")
+
+  @@map("tblenquiry")
+}
+
+model Issue {
+  id              Int       @id @default(autoincrement())
+  userEmail       String    @map("UserEmail") @db.VarChar(100)
+  issue           String    @map("Issue") @db.VarChar(100)
+  description     String    @map("Description")
+  postingDate     DateTime  @default(now()) @map("PostingDate")
+  adminRemark     String?   @map("AdminRemark")
+  adminRemarkDate DateTime? @map("AdminremarkDate")
+  user            User      @relation(fields: [userEmail], references: [emailId])
+
+  @@map("tblissues")
+}
+
+model Page {
+  id     Int    @id @default(autoincrement())
+  type   String @db.VarChar(255)
+  detail String
+
+  @@map("tblpages")
+}
