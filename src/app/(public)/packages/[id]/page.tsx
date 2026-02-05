@@ -6,6 +6,10 @@ import BookingForm from '@/components/packages/BookingForm'
 import Link from 'next/link'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
+import { ReviewList } from '@/components/reviews/review-list'
+import { ReviewForm } from '@/components/reviews/review-form'
+import { ShareButtons } from '@/components/social/share-buttons'
+import { StarRating } from '@/components/reviews/star-rating'
 
 interface PackageDetailsProps {
     params: {
@@ -14,8 +18,9 @@ interface PackageDetailsProps {
 }
 
 export default async function PackageDetailsPage({ params }: PackageDetailsProps) {
+    const pkgId = parseInt(params.id)
     const pkg = await prisma.tourPackage.findUnique({
-        where: { id: parseInt(params.id) },
+        where: { id: pkgId },
     })
 
     if (!pkg) {
@@ -23,6 +28,40 @@ export default async function PackageDetailsPage({ params }: PackageDetailsProps
     }
 
     const user = await getCurrentUser()
+
+    // Fetch Reviews
+    const reviews = await prisma.review.findMany({
+        where: { packageId: pkgId, isApproved: true },
+        include: {
+            user: {
+                select: { fullName: true }
+            }
+        },
+        orderBy: { createdAt: 'desc' }
+    })
+
+    // Calculate ratings
+    const totalReviews = reviews.length
+    const averageRating = totalReviews > 0
+        ? reviews.reduce((acc, curr) => acc + curr.rating, 0) / totalReviews
+        : 0
+
+    // Check if user has a confirmed booking for this package
+    const userBooking = user ? await prisma.booking.findFirst({
+        where: {
+            packageId: pkgId,
+            userEmail: user.email!,
+            status: 1 // Confirmed
+        }
+    }) : null
+
+    // Check if user has already reviewed
+    const userReview = user ? await prisma.review.findFirst({
+        where: {
+            packageId: pkgId,
+            userEmail: user.email!
+        }
+    }) : null
 
     return (
         <>
@@ -32,7 +71,15 @@ export default async function PackageDetailsPage({ params }: PackageDetailsProps
                     <div className="container mx-auto px-4">
                         <div className="flex flex-col md:flex-row justify-between items-end gap-4">
                             <div>
-                                <span className="bg-white/20 px-3 py-1 rounded text-sm mb-4 inline-block">{pkg.packageType} Package</span>
+                                <div className="flex items-center gap-3 mb-4">
+                                    <span className="bg-white/20 px-3 py-1 rounded text-sm inline-block">{pkg.packageType} Package</span>
+                                    {totalReviews > 0 && (
+                                        <div className="flex items-center gap-1 bg-black/20 px-3 py-1 rounded">
+                                            <StarRating rating={averageRating} size="sm" />
+                                            <span className="text-sm font-medium ml-1">({totalReviews} reviews)</span>
+                                        </div>
+                                    )}
+                                </div>
                                 <h1 className="text-5xl font-extrabold">{pkg.packageName}</h1>
                                 <p className="mt-2 text-xl opacity-90 flex items-center">
                                     <i className="fa fa-map-marker-alt mr-2"></i> {pkg.packageLocation}
@@ -50,12 +97,18 @@ export default async function PackageDetailsPage({ params }: PackageDetailsProps
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                         {/* Main Content */}
                         <div className="lg:col-span-2 space-y-12">
-                            <div className="rounded-3xl overflow-hidden shadow-2xl overflow-hidden h-[400px] md:h-[600px]">
+                            <div className="rounded-3xl overflow-hidden shadow-2xl h-[400px] md:h-[600px] relative group">
                                 <img
                                     src={`/images/packages/${pkg.packageImage}`}
                                     alt={pkg.packageName}
-                                    className="w-full h-full object-cover"
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                 />
+                                <div className="absolute top-4 right-4">
+                                    <ShareButtons
+                                        url={`${process.env.NEXTAUTH_URL}/packages/${pkg.id}`}
+                                        title={`Check out this amazing tour package: ${pkg.packageName}`}
+                                    />
+                                </div>
                             </div>
 
                             <div className="bg-white rounded-3xl p-10 shadow-lg border border-gray-100">
@@ -82,11 +135,32 @@ export default async function PackageDetailsPage({ params }: PackageDetailsProps
                                     ))}
                                 </div>
                             </div>
+
+                            {/* Review Section */}
+                            <div id="reviews" className="bg-white rounded-3xl p-10 shadow-lg border border-gray-100">
+                                <h2 className="text-3xl font-bold mb-8 flex items-center text-gray-800">
+                                    <span className="w-10 h-1 bg-primary mr-4"></span>
+                                    Reviews & Ratings
+                                </h2>
+
+                                <ReviewList
+                                    reviews={reviews as any}
+                                    averageRating={averageRating}
+                                    totalReviews={totalReviews}
+                                />
+
+                                {user && userBooking && !userReview && (
+                                    <div className="mt-10 border-t pt-10">
+                                        <h3 className="text-xl font-bold mb-6">Write a Review</h3>
+                                        <ReviewForm packageId={pkg.id} packageName={pkg.packageName} />
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         {/* Booking Section */}
                         <div className="lg:col-span-1">
-                            <div className="sticky top-24">
+                            <div className="sticky top-24 space-y-8">
                                 <div className="bg-white rounded-3xl p-10 shadow-2xl border border-gray-100">
                                     <h3 className="text-2xl font-bold mb-6 text-gray-800">Reserve This Trip</h3>
                                     {user ? (
@@ -106,6 +180,24 @@ export default async function PackageDetailsPage({ params }: PackageDetailsProps
                                             <p className="mt-4 text-xs text-blue-500 font-medium">Safe and Secure Booking Guaranteed</p>
                                         </div>
                                     )}
+                                </div>
+
+                                <div className="bg-gray-50 rounded-3xl p-8 border border-gray-200">
+                                    <h4 className="font-bold text-gray-800 mb-4">Why Book With Us?</h4>
+                                    <ul className="space-y-3">
+                                        <li className="flex items-start text-sm text-gray-600">
+                                            <i className="fa fa-check text-green-500 mt-1 mr-2"></i>
+                                            <span>Best Price Guarantee</span>
+                                        </li>
+                                        <li className="flex items-start text-sm text-gray-600">
+                                            <i className="fa fa-check text-green-500 mt-1 mr-2"></i>
+                                            <span>Secure Payments</span>
+                                        </li>
+                                        <li className="flex items-start text-sm text-gray-600">
+                                            <i className="fa fa-check text-green-500 mt-1 mr-2"></i>
+                                            <span>24/7 Customer Support</span>
+                                        </li>
+                                    </ul>
                                 </div>
                             </div>
                         </div>

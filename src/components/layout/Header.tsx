@@ -2,6 +2,8 @@ import Link from 'next/link'
 import { getCurrentUser } from '@/lib/auth-utils'
 import AuthLinks from './AuthLinks'
 
+import { LanguageSwitcher } from './language-switcher'
+
 export async function Header() {
     const user = await getCurrentUser()
 
@@ -50,9 +52,12 @@ export async function Header() {
                             )}
                         </ul>
 
-                        <ul className="flex items-center space-x-3">
-                            <AuthLinks user={user ? { name: user.name, email: user.email } : null} />
-                        </ul>
+                        <div className="flex items-center space-x-4">
+                            <ul className="flex items-center space-x-3">
+                                <AuthLinks user={user ? { name: user.name, email: user.email } : null} />
+                            </ul>
+                            <LanguageSwitcher />
+                        </div>
                     </div>
                 </div>
             </div>
